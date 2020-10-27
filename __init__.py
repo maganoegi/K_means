@@ -58,7 +58,6 @@ class K_means():
             # find the minimal distance for each point, classifying them into respective clusters
             for i, distance_vector in enumerate(distance_matrix):
                 cluster_nb = distance_vector.index(np.min(distance_vector))
-                # np.append(self.clusters[cluster_nb].data, np.array(self.dataset[i][0]), axis=0)
                 self.clusters[cluster_nb].data.append(self.dataset[i][0])
 
             # calculate the mean of the clusters
@@ -68,6 +67,7 @@ class K_means():
 
                 cluster.done = np.linalg.norm(cluster.prev_mean - cluster.mean) < self.EPSILON
 
+            # check whether the clusters have stopped moving - signalling the end of the algorithm
             self.done = all([cluster.done for cluster in self.clusters])
             
 
