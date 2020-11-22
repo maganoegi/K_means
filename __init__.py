@@ -17,8 +17,8 @@ class K_means():
     MIN_VAL = 0
     MAX_VAL = 10000
     NB_POINTS = 200
-    DEFAULT_K = 5
-    EPSILON = 0.7
+    DEFAULT_K = 3
+    EPSILON = 0.01
 
 
     def __init__(self, dataset=None, K=DEFAULT_K, points=NB_POINTS, min_val=MIN_VAL, max_val=MAX_VAL):
@@ -42,6 +42,10 @@ class K_means():
         return np.random.randint(self.min_val, self.max_val, size=(1, 2), dtype=int)
 
 
+    def __reset_cluster_data(self):
+        for cluster in self.clusters:
+            cluster.data = []
+
     def train(self):
         while not self.done:
 
@@ -50,12 +54,12 @@ class K_means():
             for point in self.dataset:
                 distances = []
                 for cluster in self.clusters:
-                    distance = np.linalg.norm(point - cluster.mean[0])
+                    distance = np.linalg.norm(point - cluster.mean)
                     distances.append(distance)
                 distance_matrix.append(distances)
             
-
             # find the minimal distance for each point, classifying them into respective clusters
+            self.__reset_cluster_data()
             for i, distance_vector in enumerate(distance_matrix):
                 cluster_nb = distance_vector.index(np.min(distance_vector))
                 self.clusters[cluster_nb].data.append(self.dataset[i][0])
@@ -66,10 +70,9 @@ class K_means():
                 cluster.mean = self.__mean(cluster.data)
 
                 cluster.done = np.linalg.norm(cluster.prev_mean - cluster.mean) < self.EPSILON
-
+            
             # check whether the clusters have stopped moving - signalling the end of the algorithm
             self.done = all([cluster.done for cluster in self.clusters])
-            
 
     def __mean(self, collection):
         average_x = sum([coord[0] for coord in collection]) / len(collection)
@@ -94,8 +97,6 @@ class K_means():
         variance /= self.nb_points
 
         print(variance)
-
-
 
     def __str__(self):
         pass
